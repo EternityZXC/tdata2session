@@ -11,8 +11,7 @@ from telethon.errors import (
     UsernameNotOccupiedError,
 )
 
-# === SAME API DATA ===
-# Get real values from https://my.telegram.org -> API development tools.
+# === API DATA ===
 load_dotenv()
 
 API_ID = int(os.environ["API_ID"])
@@ -46,7 +45,7 @@ async def send_test_message(session_path: Path, target_username: str) -> None:
     await client.connect()
 
     if not await client.is_user_authorized():
-        print(f"[{session_path.name}] Session is NOT authorized!")
+        print(f"[{session_path.name}] Session is NOT authorized!\n")
         await client.disconnect()
         return
 
@@ -55,20 +54,20 @@ async def send_test_message(session_path: Path, target_username: str) -> None:
 
     try:
         await client.send_message(target_username, "Test message from Telethon session")
-        print(f"[{session_path.name}] Message sent successfully!")
+        print(f"[{session_path.name}] Message sent successfully!\n")
     except UsernameNotOccupiedError:
-        print(f"[{session_path.name}] Failed: no user with username @{target_username} exists.")
+        print(f"[{session_path.name}] Failed: no user with username @{target_username} exists.\n")
     except UserPrivacyRestrictedError:
-        print(f"[{session_path.name}] Failed: that user's privacy settings block messages from you.")
+        print(f"[{session_path.name}] Failed: that user's privacy settings block messages from you.\n")
     except (PeerFloodError, FloodWaitError) as e:
-        print(f"[{session_path.name}] Failed: rate-limited by Telegram ({e}).")
+        print(f"[{session_path.name}] Failed: rate-limited by Telegram ({e}).\n")
     except Exception as e:
-        print(f"[{session_path.name}] Failed to send message: {e}")
+        print(f"[{session_path.name}] Failed to send message: {e}\n")
     finally:
         await client.disconnect()
 
 
-async def check_all_sessions() -> None:
+async def check_all_sessions(send_test_message_flag: bool = False, target_username: str = "") -> None:
     if not SESSIONS_DIR.is_dir():
         print(f"'{SESSIONS_DIR}' folder not found - run the tdata->session converter first")
         return
@@ -80,6 +79,11 @@ async def check_all_sessions() -> None:
         return
 
     print(f"Found {len(session_files)} session(s)\n")
+
+    if send_test_message_flag and target_username:
+        for session_path in session_files:
+            await send_test_message(session_path, target_username)
+        return
 
     for session_path in session_files:
         await check_one(session_path)
