@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 
 from tdata_to_session import main as create_sessions_from_tdata
 from verify_session import check_all_sessions
@@ -12,7 +13,14 @@ MENU = """
 """
 
 
+def ensure_folders() -> None:
+    Path("tdata_accounts").mkdir(exist_ok=True)
+    Path("sessions").mkdir(exist_ok=True)
+ 
+
 async def run() -> None:
+    ensure_folders()
+    
     while True:
         print(MENU)
         choice = input("Choose an option: ").strip()
