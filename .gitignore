@@ -1,0 +1,6 @@
+.env
+sessions/
+tdata_accounts/
+__pycache__/
+*.pyc
+.venv/
